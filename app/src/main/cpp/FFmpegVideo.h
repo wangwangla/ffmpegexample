@@ -6,9 +6,11 @@
 #define FFMPEDDEMO_FFMPEGVIDEO_H
 
 
+#include "JavaCallHelper.h"
+
 class FFmpegVideo {
 public:
-    FFmpegVideo(const char *dataSource);
+    FFmpegVideo(JavaCallHelper *javaCallHelper,const char *dataSource);
     ~FFmpegVideo();
     void prepare();
     void _prepare();
@@ -17,6 +19,7 @@ private:
     char *dataSource;
     pthread_t pid;
     AVFormatContext *avFormatContext;
+    JavaCallHelper *javaCallHelper;
 };
 
 

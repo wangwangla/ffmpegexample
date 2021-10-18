@@ -8,15 +8,17 @@ extern "C"{
 #include <libavformat/avformat.h>
 }
 #include "FFmpegVideo.h"
+#include "macro.h"
 
-FFmpegVideo::FFmpegVideo(const char *dataSource) {
+FFmpegVideo::FFmpegVideo(JavaCallHelper *javaCallHelper,const char *dataSource) {
+    this->javaCallHelper = javaCallHelper;
     this->dataSource = new char [strlen(dataSource)];
     strcpy(this->dataSource,dataSource);
 }
 
 FFmpegVideo::~FFmpegVideo() {
-    delete dataSource;
-    dataSource = 0;
+    DELETE(dataSource);
+    DELETE(javaCallHelper);
 }
 
 void *task_prepare(void *args){
@@ -37,10 +39,55 @@ void FFmpegVideo::_prepare() {
     av_register_all();
     avformat_network_init();//初始化网络
     avFormatContext =avformat_alloc_context();
-    AVDictionary *opts = NULL;
-    //如果这么久都没有打开，就认为有问题
-    av_dict_set(&opts, "timeout", "30000000", 0);
+    int ret = avformat_open_input(&avFormatContext,dataSource,NULL,0);
+    if(ret != 0){
+        javaCallHelper->error(THREAD_CHILD,FFMPEG_CAN_NOT_OPEN_URL);
+        return;
+    }
 
-    avformat_open_input(&avFormatContext,dataSource,NULL,&opts);
+//    查找视频流
+//  返回大于等于0 就是 成功
+    avformat_find_stream_info(avFormatContext,0);
+//    会解码到多个流
+    for (int i = 0; i < avFormatContext->nb_streams; ++i) {
+        //得到的是音频或者视频
+        AVStream *stream = avFormatContext->streams[i];
+//        包含解码的各种参数
+        AVCodecParameters *codecParameters = stream->codecpar;
+//        通过操作
+//        都需要得到解码器
+//      1.查值编码方式得到解码器
+//
+        AVCodec *dec = avcodec_find_decoder(codecParameters->codec_id);
+        if(dec == NULL){
+            javaCallHelper->error(THREAD_CHILD,FFMPEG_FIND_DECODER_FAIL);
+            return;
+        }
+//        获取上下文
+        AVCodecContext *context = avcodec_alloc_context3(dec);
+        if(context == NULL){
+            javaCallHelper->error(THREAD_CHILD,FFMPEG_CODEC_CONTEXT_PARAMETERS_FAIL);
+            return;
+        }
+
+//        设置上下文中的参数
+        ret = avcodec_parameters_to_context(context,codecParameters);
+        if(ret < 0){
+            javaCallHelper->error(THREAD_CHILD,FFMPEG_CODEC_CONTEXT_PARAMETERS_FAIL);
+            return;
+        }
+
+//        参数设置完了，  然后打开
+        ret = avcodec_open2(context,dec,0);
+        if (ret!=0){
+            javaCallHelper->error(THREAD_CHILD,FFMPEG_OPEN_DECODER_FAIL);
+            return;
+        }
+        if(codecParameters->codec_type == AVMEDIA_TYPE_AUDIO){
+
+        } else if (codecParameters->codec_type == AVMEDIA_TYPE_VIDEO){
+
+        }
+    }
 
 }

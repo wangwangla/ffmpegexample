@@ -10,8 +10,6 @@ set(libname play)  #编译之后的名字  不一样要和文件名相同
 
 include_directories(
         include
-        play
-        utils
         ${CMAKE_SOURCE_DIR}/
 )
 
