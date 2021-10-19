@@ -82,9 +82,9 @@ void FFmpegVideo::_prepare() {
             return;
         }
         if(codecParameters->codec_type == AVMEDIA_TYPE_AUDIO){
-            audioChannel = new AudioChannel();
+            audioChannel = new AudioChannel(i);
         } else if (codecParameters->codec_type == AVMEDIA_TYPE_VIDEO){
-            videoChannel = new VideoChannel();
+            videoChannel = new VideoChannel(i);
         }
     }
     if (!audioChannel && !videoChannel){
@@ -96,7 +96,37 @@ void FFmpegVideo::_prepare() {
     javaCallHelper->prepare(THREAD_CHILD);
 }
 
+void* play(void* args){
+//    读取数据包
+    FFmpegVideo *fFmpegVideo = static_cast<FFmpegVideo *>(args);
+    fFmpegVideo->_start
+    ();
+//解码
+    return 0;
+}
+//初始化指针一定要给默认值
 void FFmpegVideo::start() {
+    isPlaying = 1;
+    pthread_create(&pid_play,0,play, this);
+}
 
+void FFmpegVideo::_start() {
+    int ret  ;
+    while (isPlaying){
+        AVPacket *avPacket = av_packet_alloc();
+        ret = av_read_frame(avFormatContext,avPacket);
+        if (ret == 0){
+            if (audioChannel&&avPacket->stream_index == audioChannel->audioChannel){
+
+            } else if (videoChannel && avPacket->stream_index == videoChannel->videoIndex){
+                videoChannel->packets.Push(avPacket);
+            }
+
+        } else if (ret == AVERROR_EOF){
+
+        } else{
+
+        }
+    }
 }
 //动态库有加载顺序问题    静态库没有

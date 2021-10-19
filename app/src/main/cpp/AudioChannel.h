@@ -6,7 +6,13 @@
 #define FFMPEDDEMO_AUDIOCHANNEL_H
 
 
-class AudioChannel {
+#include "BaseChannel.h"
+
+class AudioChannel: public BaseChannel {
+public:
+    AudioChannel(int id);
+    virtual ~AudioChannel();
+    int audioChannel;
 
 };
 

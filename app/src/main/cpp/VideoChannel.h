@@ -6,7 +6,14 @@
 #define FFMPEDDEMO_VIDEOCHANNEL_H
 
 
-class VideoChannel {
+#include "BaseChannel.h"
+
+class VideoChannel: public BaseChannel {
+public:
+    VideoChannel(int videoIndex);
+    virtual ~VideoChannel();
+
+    int videoIndex;
 
 };
 

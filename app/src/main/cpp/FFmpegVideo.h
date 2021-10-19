@@ -24,13 +24,17 @@ public:
 
     void start();
 
+    void _start();
+
 private:
     char *dataSource;
     pthread_t pid;
+    pthread_t pid_play;
     AVFormatContext *avFormatContext;
     JavaCallHelper *javaCallHelper;
     AudioChannel *audioChannel;
     VideoChannel *videoChannel;
+    bool isPlaying;
 };
 
 
