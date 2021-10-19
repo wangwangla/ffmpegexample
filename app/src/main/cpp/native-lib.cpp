@@ -26,3 +26,9 @@ Java_com_kangwang_ffmpeddemo_play_DNPlayer_native_1prepare(JNIEnv *env, jobject 
     //因为我们这这里删除了
     env->ReleaseStringUTFChars(source_data,sourceData);
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_kangwang_ffmpeddemo_play_DNPlayer_native_1start(JNIEnv *env, jobject thiz) {
+    // TODO: implement native_start()
+    fFmpegVideo->start();
+}

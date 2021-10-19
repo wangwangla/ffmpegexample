@@ -19,9 +19,17 @@ public class MainActivity extends AppCompatActivity {
         player = new DNPlayer();
         player.setSurfaceView(surfaceView);
         player.setDataSource("");
+        player.prepare();
+        player.setPrapare(new DNPlayer.OnPrepareListener() {
+            @Override
+            public void onPrepare() {
+                System.out.println("播放器准备完成");
+                start();
+            }
+        });
     }
 
     public void start(){
-        player.prepare();
+        player.start();
     }
 }

@@ -4,7 +4,7 @@
 
 #ifndef FFMPEDDEMO_JAVACALLHELPER_H
 #define FFMPEDDEMO_JAVACALLHELPER_H
-
+#include <jni.h>
 /**
  * 帮助我们完成反射
  */
@@ -21,11 +21,14 @@ public:
      */
     void error(int thread,int errorCode);
 
+    void prepare(int thread);
+
 private:
     JavaVM *vm;
     JNIEnv *env;
     jobject instance;
     jmethodID errorMethod;
+    jmethodID prepareMethod;
 };
 
 

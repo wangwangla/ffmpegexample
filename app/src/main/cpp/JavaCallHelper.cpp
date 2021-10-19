@@ -2,7 +2,7 @@
 // Created by 28188 on 2021/10/18.
 //
 
-#include <jni.h>
+
 #include "JavaCallHelper.h"
 #include "macro.h"
 
@@ -13,7 +13,8 @@ JavaCallHelper::JavaCallHelper(JavaVM *vm, JNIEnv *jniEnv,jobject instance) {
     this->instance = env->NewGlobalRef(instance);
 
     jclass  clazz = env->GetObjectClass(instance);
-    errorMethod = env->GetMethodID(clazz,"onError","(I)V")
+    errorMethod = env->GetMethodID(clazz,"onError","(I)V");
+    prepareMethod = env->GetMethodID(clazz,"prapare","()V");
 }
 
 JavaCallHelper::~JavaCallHelper() {
@@ -34,4 +35,16 @@ void JavaCallHelper::error(int thread, int errorCode) {
 //      调用完成之后  在从vm中删除依附
         vm->DetachCurrentThread();
     }
+}
+
+void JavaCallHelper::prepare(int thread) {
+    if (thread == THREAD_CHILD){
+        env->CallVoidMethod(instance,prepareMethod);
+    } else if (thread == THREAD_MAIN){
+        JNIEnv *env;
+        vm->AttachCurrentThread(&env,0);
+        env->CallVoidMethod(instance,prepareMethod);
+        vm->DetachCurrentThread();
+    }
+
 }

@@ -4,9 +4,7 @@
 
 #include <cstring>
 #include <pthread.h>
-extern "C"{
-#include <libavformat/avformat.h>
-}
+
 #include "FFmpegVideo.h"
 #include "macro.h"
 
@@ -84,10 +82,21 @@ void FFmpegVideo::_prepare() {
             return;
         }
         if(codecParameters->codec_type == AVMEDIA_TYPE_AUDIO){
-
+            audioChannel = new AudioChannel();
         } else if (codecParameters->codec_type == AVMEDIA_TYPE_VIDEO){
-
+            videoChannel = new VideoChannel();
         }
     }
+    if (!audioChannel && !videoChannel){
+        javaCallHelper->error(THREAD_CHILD,FFMPEG_NOMEDIA);
+        return;
+    }
+
+//    准备就绪就通知java
+    javaCallHelper->prepare(THREAD_CHILD);
+}
+
+void FFmpegVideo::start() {
 
 }
+//动态库有加载顺序问题    静态库没有

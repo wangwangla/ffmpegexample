@@ -7,6 +7,13 @@
 
 
 #include "JavaCallHelper.h"
+#include "VideoChannel.h"
+#include "AudioChannel.h"
+#include <pthread.h>
+extern "C"{
+#include <libavformat/avformat.h>
+}
+
 
 class FFmpegVideo {
 public:
@@ -15,11 +22,15 @@ public:
     void prepare();
     void _prepare();
 
+    void start();
+
 private:
     char *dataSource;
     pthread_t pid;
     AVFormatContext *avFormatContext;
     JavaCallHelper *javaCallHelper;
+    AudioChannel *audioChannel;
+    VideoChannel *videoChannel;
 };
 
 

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 public class DNPlayer implements SurfaceHolder.Callback {
     private String sourceData;
     private SurfaceHolder holder;
+    private OnPrepareListener prepareListener;
 
     public void setSurfaceView(SurfaceView surfaceView) {
         holder = surfaceView.getHolder();
@@ -20,6 +21,10 @@ public class DNPlayer implements SurfaceHolder.Callback {
 
     public void prepare() {
         native_prepare(sourceData);
+    }
+
+    public void start(){
+        native_start();
     }
 
     public void realse(){
@@ -42,4 +47,24 @@ public class DNPlayer implements SurfaceHolder.Callback {
     }
 
     native void native_prepare(String sourceData);
+
+    native void native_start();
+
+    public void onError(int errorCode){
+
+    }
+
+    public void onPrepare(){
+        if (prepareListener!=null){
+            prepareListener.onPrepare();
+        }
+    }
+
+    public void setPrapare(OnPrepareListener prepareListener){
+        this.prepareListener = prepareListener;
+    }
+
+    public interface OnPrepareListener{
+        void onPrepare();
+    }
 }
